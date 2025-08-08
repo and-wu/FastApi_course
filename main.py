@@ -1,10 +1,11 @@
-from typing import Annotated
 from _pytest.nodes import Item
-from fastapi import FastAPI, Path
+from fastapi import FastAPI
 import uvicorn
 from pydantic import BaseModel, EmailStr
+from items_views import router as items_router
 
 app = FastAPI()
+app.include_router(items_router)
 
 class CreateUser(BaseModel):
     email: EmailStr
@@ -40,27 +41,7 @@ def add(a: int, b: int):
     }
 
 
-@app.get("/items/")
-def list_items():
-    return [
-        "item1",
-        "item2",
-        "item3",
-    ]
 
-
-@app.get("/items/latest/")
-def get_latest_item():
-    return {"item": {"id": "0", "name": "latest"}}
-
-
-@app.get("/items/{item_id}/")
-def get_item_by_id(item_id: Annotated[int, Path(ge=1, lt=1_000_000)]):
-    return {
-        "item": {
-            "id": item_id,
-        }
-    }
 
 if __name__ == '__main__':
     uvicorn.run("main:app", reload=True)
